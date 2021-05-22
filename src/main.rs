@@ -83,11 +83,11 @@ fn main() {
 		BitDepth::Eight(mut dta) => {
 			if shift_amount > 0 { 
 				for sample in dta.iter_mut() {
-					*sample <<= (-shift_amount) as u8;
+					*sample <<= shift_amount as u8;
 				};
 			} else {
 				for sample in dta.iter_mut() {
-					*sample >>= shift_amount as u8;
+					*sample >>= (-shift_amount) as u8;
 				};
 			}
 			wav_data = BitDepth::from(dta);
@@ -96,11 +96,11 @@ fn main() {
 		BitDepth::Sixteen(mut dta) => {
 			if shift_amount > 0 { 
 				for sample in dta.iter_mut() {
-					*sample <<= (-shift_amount) as u8;
+					*sample <<= shift_amount as u8;
 				};
 			} else {
 				for sample in dta.iter_mut() {
-					*sample >>= shift_amount as u8;
+					*sample >>= (-shift_amount) as u8;
 				};
 			}
 			wav_data = BitDepth::from(dta);
@@ -109,11 +109,11 @@ fn main() {
 		BitDepth::TwentyFour(mut dta) => {
 			if shift_amount > 0 { 
 				for sample in dta.iter_mut() {
-					*sample <<= (-shift_amount) as u8;
+					*sample <<= shift_amount as u8;
 				};
 			} else {
 				for sample in dta.iter_mut() {
-					*sample >>= shift_amount as u8;
+					*sample >>= (-shift_amount) as u8;
 				};
 			}
 			wav_data = BitDepth::from(dta);

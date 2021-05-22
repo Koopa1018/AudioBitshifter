@@ -120,6 +120,11 @@ fn main() {
 			let outpath : String = input()
 				.msg("Enter the path to save the shifted audio to: ")
 				.add_err_test(|val| {
+						*val != ""
+					},
+					"Please enter a path. "
+				)
+				.add_err_test(|val| {
 						File::open(val).is_err()
 					},
 					"That file already exists."

@@ -1,0 +1,12 @@
+[package]
+name = "audio_bitshift"
+version = "0.1.0"
+authors = ["Koopa1018 <caleblovestoytrains@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+read_input = "0.8.4"
+wav = "1.0.0"
+clap = "2.33.3"

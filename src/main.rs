@@ -61,12 +61,12 @@ fn main() {
 			.msg("Negative=L, Positive=R: ")
 			.inside_err(
 				-bits_max..=bits_max,
-				"Shifting that far will completely blank all the samples."
+				"Shifting that far will completely blank all the samples. Enter a smaller number:"
 			)
 			.add_err_test(|val| {
 					*val != 0
 				},
-				"Shifting by 0 bits won't change the audio at all."
+				"Shifting by 0 bits won't change the audio at all. Enter something other than 0:"
 			)
 			.get()
 	};
@@ -121,21 +121,21 @@ fn main() {
 	let mut dst_file = {
 		//Get filepath from user.
 		let outpath : String = input()
-			.msg("Enter the path to save the shifted audio to: ")
+			.msg("Enter a path to save the shifted audio to: ")
 			.add_err_test(|val| {
 					*val != ""
 				},
-				"Please enter a path. "
+				"Please enter a path: "
 			)
 			.add_err_test(|val| {
 					File::open(val).is_err()
 				},
-				"That file already exists."
+				"That file already exists. Enter a different path (or delete that file): "
 			)
 			.add_err_test(|val| {
 					!Path::new(val).is_dir()
 				},
-				"That path already points to a folder."
+				"That path already points to a folder. Enter a different path (or delete that folder): "
 			)
 			.get()
 		;

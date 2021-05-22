@@ -15,7 +15,7 @@ fn main() {
 				let filepath : String = input()
 					.msg("Enter the path of the .wav file to bitshift: ")
 					.add_err_test(|val| {
-							File::open(val).is_ok()
+							Path::new(val).exists()
 						},
 						"File not found. Enter a valid filepath: "
 					)
@@ -125,40 +125,51 @@ fn main() {
 
 
 	let mut dst_file = {
-		//Get filepath from user.
-		let outpath : String = input()
-			.msg("Enter a path to save the shifted audio to: ")
-			.add_err_test(|val| {
-					*val != ""
-				},
-				"Please enter a path: "
-			)
-			.add_err_test(|val| {
-					File::open(val).is_err()
-				},
-				"That file already exists. Enter a different path (or delete that file): "
-			)
-			.add_err_test(|val| {
-					!Path::new(val).is_dir()
-				},
-				"That path already points to a folder. Enter a different path (or delete that folder): "
-			)
-			.get()
-		;
-		let mut outpath = PathBuf::from(outpath);
-		
-		//Make sure the out file ends up with a .wav extension, even if it doesn't already Γ)
-		if let Some(ex) = outpath.extension() {
-			if ex != "wav" {
+		let mut dst_path = None;
+
+		while dst_path.is_none() {
+			//Get filepath from user.
+			let outpath : String = input()
+				.msg("Enter a path to save the shifted audio to (will always come out a .wav): ")
+				.add_err_test(|val| {
+						*val != ""
+					},
+					"Please enter a path: "
+				)
+				.add_err_test(|val| {
+						!Path::new(val).exists()
+					},
+					"That file already exists. Enter a different path (or delete that file): "
+				)
+				.add_err_test(|val| {
+						!Path::new(val).is_dir()
+					},
+					"That path already points to a folder. Enter a different path (or delete that folder): "
+				)
+				.get()
+			;
+			let mut outpath = PathBuf::from(outpath);
+			
+			//Make sure the out file ends up with a .wav extension, even if it doesn't already Γ)
+			if let Some(ex) = outpath.extension() {
+				if ex != "wav" {
+					outpath.set_extension("wav");
+				}
+			} else {
 				outpath.set_extension("wav");
+			};
+			
+			if !outpath.exists() && !outpath.is_dir() {
+				dst_path = Some(outpath);
+			} else {
+				println!("That file or directory already exists.");
 			}
-		} else {
-			outpath.set_extension("wav");
-		};
+		}
+		let dst_path = dst_path.unwrap();
 
-		println!("Saving bit-shifted audio to {}...", outpath.to_str().unwrap());
+		println!("Saving bit-shifted audio to {}...", dst_path.to_str().unwrap());
 
-		BufWriter::new(File::create(outpath).unwrap())
+		BufWriter::new(File::create(dst_path).unwrap())
 	};
 
 

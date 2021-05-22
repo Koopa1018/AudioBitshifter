@@ -13,7 +13,7 @@ fn main() {
 			while returner.is_none() {
 				//Get filepath from user.
 				let filepath : String = input()
-					.msg("Enter the name of the .wav file to bitshift: ")
+					.msg("Enter the path of the .wav file to bitshift: ")
 					.add_err_test(|val| {
 							File::open(val).is_ok()
 						},
@@ -36,19 +36,21 @@ fn main() {
 			returner.unwrap()
 		};
 
+		println!("Loading file...", );
+
 		wav::read(&mut src_file).unwrap_or_default()
 	};
 
 	match wav_data {
-		BitDepth::Empty => print!("This file contains no data."),
-		BitDepth::Eight(_) => print!("This file's bit depth is 8."),
-		BitDepth::Sixteen(_) => print!("This file's bit depth is 16."),
-		BitDepth::TwentyFour(_) => print!("This file's bit depth is 24."),
-		BitDepth::ThirtyTwoFloat(_) => print!("This file is floating point; bit shifts won't really work.")
+		BitDepth::Empty => println!("This file contains no data."),
+		BitDepth::Eight(_) => println!("This file's bit depth is 8."),
+		BitDepth::Sixteen(_) => println!("This file's bit depth is 16."),
+		BitDepth::TwentyFour(_) => println!("This file's bit depth is 24."),
+		BitDepth::ThirtyTwoFloat(_) => println!("This file is floating point; bit shifts won't really work.")
 	};
 		
 	let shift_amount = {
-		print!("How many bits will I shift the samples?");
+		println!("How many bits should I shift the samples?");
 		
 		let bits_max = (wav_info.bits_per_sample as i8) - 1;
 		input()
@@ -65,6 +67,7 @@ fn main() {
 			.get()
 	};
 
+	println!("Shifting audio...");
 	let do_output = match wav_data {
 		BitDepth::Empty => false,
 		BitDepth::Eight(mut dta) => {
@@ -108,6 +111,7 @@ fn main() {
 		},
 		BitDepth::ThirtyTwoFloat(_) => false
 	};
+	println!("");
 
 
 	if do_output {
@@ -138,12 +142,16 @@ fn main() {
 				outpath.set_extension("wav");
 			};
 
-			
+			println!("Saving bit-shifted audio to {}...", outpath.to_str().unwrap());
+
 			BufWriter::new(File::create(outpath).unwrap())
 		};
 
+
 		if let Err(errval) = wav::write(wav_info, &wav_data, &mut dst_file) {
-			eprint!("{}", errval);
+			eprint!("ERROR: {}", errval);
+		} else {
+			print!("Audio saved successfully.");
 		}
 	}
 }

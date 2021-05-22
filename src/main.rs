@@ -17,7 +17,7 @@ fn main() {
 					.add_err_test(|val| {
 							File::open(val).is_ok()
 						},
-						"File not found."
+						"File not found. Enter a valid filepath: "
 					)
 					.get()
 				;
@@ -25,8 +25,14 @@ fn main() {
 				
 				//Get new input if the path doesn't work.
 				match filepath.extension() {
-					Some(ex) => if ex != "wav" {continue},
-					None => continue //can be hit if the file is extensionless
+					Some(ex) => if ex != "wav" {
+						print!("I can only handle .wav files. ");
+						continue
+					},
+					None => {
+						print!("I can only handle .wav files. ");
+						continue //can be hit if the file is extensionless
+					}
 				};
 
 

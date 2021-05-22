@@ -64,7 +64,7 @@ fn main() {
 		
 		let bits_max = (wav_info.bits_per_sample as i8) - 1;
 		input()
-			.msg("Negative=L, Positive=R: ")
+			.msg("Positive = louder, negative = quieter: ")
 			.inside_err(
 				-bits_max..=bits_max,
 				"Shifting that far will completely blank all the samples. Enter a smaller number:"
@@ -81,7 +81,7 @@ fn main() {
 	match wav_data {
 		BitDepth::Empty => false,
 		BitDepth::Eight(mut dta) => {
-			if shift_amount < 0 { 
+			if shift_amount > 0 { 
 				for sample in dta.iter_mut() {
 					*sample <<= (-shift_amount) as u8;
 				};
@@ -94,7 +94,7 @@ fn main() {
 			true
 		},
 		BitDepth::Sixteen(mut dta) => {
-			if shift_amount < 0 { 
+			if shift_amount > 0 { 
 				for sample in dta.iter_mut() {
 					*sample <<= (-shift_amount) as u8;
 				};
@@ -107,7 +107,7 @@ fn main() {
 			true
 		},
 		BitDepth::TwentyFour(mut dta) => {
-			if shift_amount < 0 { 
+			if shift_amount > 0 { 
 				for sample in dta.iter_mut() {
 					*sample <<= (-shift_amount) as u8;
 				};

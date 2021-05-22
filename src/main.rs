@@ -41,13 +41,17 @@ fn main() {
 		wav::read(&mut src_file).unwrap_or_default()
 	};
 
-	match wav_data {
-		BitDepth::Empty => println!("This file contains no data."),
-		BitDepth::Eight(_) => println!("This file's bit depth is 8."),
-		BitDepth::Sixteen(_) => println!("This file's bit depth is 16."),
-		BitDepth::TwentyFour(_) => println!("This file's bit depth is 24."),
-		BitDepth::ThirtyTwoFloat(_) => println!("This file is floating point; bit shifts won't really work.")
+	let do_output = match wav_data {
+		BitDepth::Empty => {println!("This file contains no data."); false},
+		BitDepth::Eight(_) => {println!("This file's bit depth is 8."); true},
+		BitDepth::Sixteen(_) => {println!("This file's bit depth is 16."); true},
+		BitDepth::TwentyFour(_) => {println!("This file's bit depth is 24."); true},
+		BitDepth::ThirtyTwoFloat(_) => {println!("This file is floating point; bit shifts won't really work."); false},
 	};
+	if !do_output {
+		return;
+	}
+	println!("");
 		
 	let shift_amount = {
 		println!("How many bits should I shift the samples?");
@@ -68,7 +72,7 @@ fn main() {
 	};
 
 	println!("Shifting audio...");
-	let do_output = match wav_data {
+	match wav_data {
 		BitDepth::Empty => false,
 		BitDepth::Eight(mut dta) => {
 			if shift_amount < 0 { 
@@ -114,49 +118,47 @@ fn main() {
 	println!("");
 
 
-	if do_output {
-		let mut dst_file = {
-			//Get filepath from user.
-			let outpath : String = input()
-				.msg("Enter the path to save the shifted audio to: ")
-				.add_err_test(|val| {
-						*val != ""
-					},
-					"Please enter a path. "
-				)
-				.add_err_test(|val| {
-						File::open(val).is_err()
-					},
-					"That file already exists."
-				)
-				.add_err_test(|val| {
-						!Path::new(val).is_dir()
-					},
-					"That path already points to a folder."
-				)
-				.get()
-			;
-			let mut outpath = PathBuf::from(outpath);
-			
-			//Make sure the out file ends up with a .wav extension, even if it doesn't already Γ)
-			if let Some(ex) = outpath.extension() {
-				if ex != "wav" {
-					outpath.set_extension("wav");
-				}
-			} else {
+	let mut dst_file = {
+		//Get filepath from user.
+		let outpath : String = input()
+			.msg("Enter the path to save the shifted audio to: ")
+			.add_err_test(|val| {
+					*val != ""
+				},
+				"Please enter a path. "
+			)
+			.add_err_test(|val| {
+					File::open(val).is_err()
+				},
+				"That file already exists."
+			)
+			.add_err_test(|val| {
+					!Path::new(val).is_dir()
+				},
+				"That path already points to a folder."
+			)
+			.get()
+		;
+		let mut outpath = PathBuf::from(outpath);
+		
+		//Make sure the out file ends up with a .wav extension, even if it doesn't already Γ)
+		if let Some(ex) = outpath.extension() {
+			if ex != "wav" {
 				outpath.set_extension("wav");
-			};
-
-			println!("Saving bit-shifted audio to {}...", outpath.to_str().unwrap());
-
-			BufWriter::new(File::create(outpath).unwrap())
+			}
+		} else {
+			outpath.set_extension("wav");
 		};
 
+		println!("Saving bit-shifted audio to {}...", outpath.to_str().unwrap());
 
-		if let Err(errval) = wav::write(wav_info, &wav_data, &mut dst_file) {
-			eprint!("ERROR: {}", errval);
-		} else {
-			print!("Audio saved successfully.");
-		}
+		BufWriter::new(File::create(outpath).unwrap())
+	};
+
+
+	if let Err(errval) = wav::write(wav_info, &wav_data, &mut dst_file) {
+		eprint!("ERROR: {}", errval);
+	} else {
+		print!("Audio saved successfully.");
 	}
 }
